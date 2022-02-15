@@ -4,7 +4,9 @@ const todoRoutes = require("./routes/todo.routes");
 const util = require("util");
 const encoder = new util.TextEncoder("utf-8");
 const mangodb = require("./mongodb/mongodb.connect");
+const dotEnv = require("dotenv");
 
+dotEnv.config();
 mangodb.connect();
 
 app.use(express.json());
