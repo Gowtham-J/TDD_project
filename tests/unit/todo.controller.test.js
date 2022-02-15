@@ -3,6 +3,7 @@ const TodoModel = require("../../model/todo.model");
 const httpMocks = require("node-mocks-http");
 const newTodo = require("../mock-data/new-todo.json");
 const allTodos = require("../mock-data/all-todos.json");
+const dbHandler = require("../../db.handler");
 
 jest.mock("../../model/todo.model");
 
@@ -14,10 +15,23 @@ beforeEach(() => {
   next = jest.fn();
 });
 
+// beforeAll(async () => await dbHandler.connect());
+
+/**
+ * Clear all test data after every test.
+ */
+// afterEach(async () => await dbHandler.clearDatabase());
+
+/**
+ * Remove and close the db and server.
+ */
+// afterAll(async () => await dbHandler.closeDatabase());
+
 describe("TodoController.deleteTodo", () => {
   it("should have a deleteTodo function", () => {
     expect(typeof TodoController.deleteTodo).toBe("function");
   });
+
   it("should delete with TodoModel.findByIdAndDelete", async () => {
     req.params.todoId = todoId;
     req.body = newTodo;
@@ -32,13 +46,15 @@ describe("TodoController.deleteTodo", () => {
     expect(res.statusCode).toBe(200);
     expect(res._getJSONData()).toStrictEqual(newTodo);
   });
+
   it("should handle errors for deleteTodo", async () => {
-    const errorMessage = { message: "Error " };
+    const errorMessage = { message: "Error" };
     const rejectedPromise = Promise.reject(errorMessage);
     TodoModel.findByIdAndUpdate.mockReturnValue(rejectedPromise);
     await TodoController.updateTodo(req, res, next);
     expect(next).toBeCalledWith(errorMessage);
   });
+
   it("should return 404 for the unidentified Id", async () => {
     TodoModel.findByIdAndDelete.mockReturnValue(null);
     await TodoController.deleteTodo(req, res, next);
